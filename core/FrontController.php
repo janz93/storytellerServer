@@ -47,6 +47,15 @@ class FrontController {
     });
   }
   
+  private function _decodeUrl() {
+      $post = array();
+      foreach (explode('&', $this->_app->request->getBody()) as $postParam) {
+          $param = explode('=', $postParam);
+          $post[urldecode($param[0])] = urldecode($param[1]);
+      }
+      return $post;
+  }
+  
   private function _registerUserRoutes() {
     $userController = new UserController();
     $this->_app->post('/register', function () use ($userController) {
