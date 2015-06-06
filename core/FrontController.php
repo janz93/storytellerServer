@@ -64,7 +64,8 @@ class FrontController {
     });
     
     $this->_app->post('/login', function () use ($userController) {
-      $result = $userController->authenticate($this->_app->request->post('email'), $this->_app->request->post('pass'));
+      $post = Storyteller\core\FrontController::_decodeUrl();
+      $result = $userController->authenticate($post['email'], $post['pass']);
       Storyteller\core\FrontController::echoResponse($result);
     });
     
