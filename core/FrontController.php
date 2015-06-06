@@ -55,16 +55,26 @@ class FrontController {
     });
   }
   
+  private function _decodeUrl() {
+    $post = array();
+    foreach (explode('&', $this->_app->request->getBody()) as $postParam) {
+        $param = explode('=', $postParam);
+        $post[urldecode($param[0])] = urldecode($param[1]);
+    }
+    return $post;
+  }
   
   private function _registerUserRoutes() {
     $userController = new UserController();
     $this->_app->post('/register', function () use ($userController) {
-      $response = $userController->registerUser($this->_app->request->post());
+      $post = $this->_decodeUrl();
+      $response = $userController->registerUser($post);
       FrontController::echoResponse($response);
     });
     
     $this->_app->post('/login', function () use ($userController) {
-      $response = $userController->checkLogin($this->_app->request->post('email'), $this->_app->request->post('pass'));
+      $post = $this->_decodeUrl();
+      $response = $userController->authenticate($post['email'], $post['pass']);
       FrontController::echoResponse($response);
       
     });
@@ -96,6 +106,6 @@ class FrontController {
     $this->_app->delete('/story/:id', function ($id) use ($storyController) {
       $response = $storyController->deleteStory($id);
       FrontController::echoResponse($response);
-    }); 
+    });    
   }
 }
