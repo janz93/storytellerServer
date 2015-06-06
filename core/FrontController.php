@@ -1,6 +1,7 @@
 <?php
 
 namespace Storyteller\core;
+
 use Storyteller\app\controller\UserController;
 use Storyteller\app\controller\StoryController;
 use Storyteller\core\Middleware\Authentication;
@@ -9,7 +10,6 @@ class FrontController {
   
   private $_app = null;
   private $_userController = null;
-  private $_authenticate = null;
   
   public function __construct() {
     $this->_app = new \Slim\Slim();
@@ -47,10 +47,11 @@ class FrontController {
   
   private function _registerRoutes() {
     $this->_app->get('/', function () {
-      echo 'Welcome to storyteller';
+      echo 'welcome';
     });
     $this->_app->group('/api', function () {
       $this->_registerUserRoutes();
+      $this->_registerStoryRoutes();
     });
   }
   
@@ -72,5 +73,29 @@ class FrontController {
       $response = $userController->findUser($id);
       FrontController::echoResponse($response);
     });
+  }
+  
+  private function _registerStoryRoutes() {
+    $storyController = new StoryController();
+    $this->_app->get('/stories', function () use ($storyController) {
+      $response = $storyController->findUserStories(Authentication::$validUser->id);
+      FrontController::echoResponse($response);
+    });
+    $this->_app->get('/story/:id', function ($id) use ($storyController) {
+      $response = $storyController->findStory($id);
+      FrontController::echoResponse($response);
+    });
+    $this->_app->post('/story', function ($id) use ($storyController) {
+      $response = $storyController->deleteStory($id);
+      FrontController::echoResponse($response);
+    });
+    $this->_app->post('/story/:id', function ($id) use ($storyController) {
+      $response = $storyController->deleteStory($id);
+      FrontController::echoResponse($response);
+    });
+    $this->_app->delete('/story/:id', function ($id) use ($storyController) {
+      $response = $storyController->deleteStory($id);
+      FrontController::echoResponse($response);
+    }); 
   }
 }
