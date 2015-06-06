@@ -2,15 +2,18 @@
 
 namespace Storyteller\core;
 use Storyteller\app\controller\UserController;
-use Storyteller;
+use Storyteller\app\controller\StoryController;
+use Storyteller\core\Middleware\Authentication;
 
 class FrontController {
   
   private $_app = null;
   private $_userController = null;
+  private $_authenticate = null;
   
   public function __construct() {
     $this->_app = new \Slim\Slim();
+    $this->_app->add(new Authentication());
   }
   
   public function run() {
@@ -30,6 +33,7 @@ class FrontController {
       }
       
       echo json_encode(array('message' => $message));
+      $this->_app->stop();
     }
   }
   
@@ -42,26 +46,31 @@ class FrontController {
   }
   
   private function _registerRoutes() {
+    $this->_app->get('/', function () {
+      echo 'Welcome to storyteller';
+    });
     $this->_app->group('/api', function () {
       $this->_registerUserRoutes();
     });
   }
   
+  
   private function _registerUserRoutes() {
     $userController = new UserController();
     $this->_app->post('/register', function () use ($userController) {
-      $result = $userController->registerUser($this->_app->request->post());
-      Storyteller\core\FrontController::echoResponse($result);
+      $response = $userController->registerUser($this->_app->request->post());
+      FrontController::echoResponse($response);
     });
     
     $this->_app->post('/login', function () use ($userController) {
-      $result = $userController->authenticate($this->_app->request->post('email'), $this->_app->request->post('pass'));
-      Storyteller\core\FrontController::echoResponse($result);
+      $response = $userController->checkLogin($this->_app->request->post('email'), $this->_app->request->post('pass'));
+      FrontController::echoResponse($response);
+      
     });
     
     $this->_app->get('/user/:id', function ($id) use ($userController)  {
-      $result = $userController->findUser($id);
-      Storyteller\core\FrontController::echoResponse($result);
+      $response = $userController->findUser($id);
+      FrontController::echoResponse($response);
     });
   }
 }
