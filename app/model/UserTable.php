@@ -8,21 +8,13 @@ class UserTable extends Table {
   
   public function createUser($userArr) {
     $data = array(
-      $userArr['name'],
-      $userArr['email'],
-      $this->_createPasswordHash($userArr['pass']),
-      $this->_createApikey()
+      'name' => $userArr['name'],
+      'email' => $userArr['email'],
+      'pass' => $this->_createPasswordHash($userArr['pass']),
+      'apikey' => $this->_createApikey()
     );
     
-    $sql = $this->_PdoConntector->prepare('
-      INSERT INTO `' . $this->_name . '` (`name`, `email`, `pass`, `apikey`, `status`) 
-      VALUES (?, ?, ?, ?, 1);
-    ');
-    if($sql->execute($data)) {
-      return $this->findUserByID($this->_PdoConntector->lastInsertId());
-    } else {
-      return false;
-    }
+    return $this->insert($this->_name, $data);
   }
   
   /**
@@ -50,8 +42,23 @@ class UserTable extends Table {
     return $this->find($this->_name);
   }
   
+  /**
+   * 
+   * @param string $email
+   * @return Ambigous <\Storyteller\app\model\mixed, NULL>
+   */
   public function findUserByEmail($email) {
     $this->setWhereCondition('`email` = ?', $email);
+    return $this->find($this->_name);
+  }
+  
+  /**
+   * 
+   * @param string $apikey
+   * @return Ambigous <\Storyteller\app\model\mixed, NULL>
+   */
+  public function findUserByApikey($apikey) {
+    $this->setWhereCondition('`apikey` = ?', $apikey);
     return $this->find($this->_name);
   }
   

@@ -1,6 +1,7 @@
 <?php
 
 namespace Storyteller\app\controller;
+
 use Storyteller\app\model\UserTable;
 
 class UserController {
@@ -31,7 +32,7 @@ class UserController {
    * @param string $pass
    * @return Ambigous <\Storyteller\app\model\mixed, NULL>|string
    */
-  public function authenticate($email, $pass) {
+  public function checkLogin($email, $pass) {
     if ($this->_userModel->checkUser($email, $pass)) {
       $user = $this->_userModel->findUserByEmail($email);
       unset($user->pass);
@@ -43,7 +44,7 @@ class UserController {
   
   /**
    * 
-   * @param unknown $id
+   * @param string $id
    * @return \Storyteller\app\model\Ambigous
    */
   public function findUser($id) {
@@ -53,7 +54,7 @@ class UserController {
         unset($user->pass);
         return array('user' => $user);
       } else {
-        return array('error' => 'No User find by given ID');
+        return array('error' => 'No User found by given ID');
       }
     }
   }
