@@ -1,0 +1,1 @@
+ALTER TABLE `user` CHANGE `status` `status` TINYINT(1) NOT NULL DEFAULT '1';
