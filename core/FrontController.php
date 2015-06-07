@@ -2,9 +2,13 @@
 
 namespace Storyteller\core;
 
+use Storyteller\core\Middleware\Authentication;
 use Storyteller\app\controller\UserController;
 use Storyteller\app\controller\StoryController;
-use Storyteller\core\Middleware\Authentication;
+use Storyteller\app\controller\CategorieController;
+use Storyteller\app\controller\TagController;
+use Storyteller\app\controller\ModusController;
+use Storyteller\app\controller\TextController;
 
 class FrontController {
   
@@ -52,6 +56,10 @@ class FrontController {
     $this->_app->group('/api', function () {
       $this->_registerUserRoutes();
       $this->_registerStoryRoutes();
+      $this->_registerModusRoutes();
+      $this->_registerCategorieRoutes();
+      $this->_registerTagRoutes();
+      $this->_registerTextRoutes();
     });
   }
   
@@ -95,17 +103,57 @@ class FrontController {
       $response = $storyController->findStory($id);
       FrontController::echoResponse($response);
     });
-    $this->_app->post('/story', function ($id) use ($storyController) {
-      $response = $storyController->deleteStory($id);
+    $this->_app->post('/story', function () use ($storyController) {
+      $post = $this->_decodeUrl();
+      $response = $storyController->createStory($post);
       FrontController::echoResponse($response);
     });
-    $this->_app->post('/story/:id', function ($id) use ($storyController) {
-      $response = $storyController->deleteStory($id);
+    $this->_app->put('/story/:id', function ($id) use ($storyController) {
+      $post = $this->_decodeUrl();
+      $response = $storyController->updateStory($id, $post);
       FrontController::echoResponse($response);
     });
     $this->_app->delete('/story/:id', function ($id) use ($storyController) {
       $response = $storyController->deleteStory($id);
       FrontController::echoResponse($response);
     });    
+  }
+  
+  private function _registerModusRoutes() {
+    $modusController = new ModusController();
+    $this->_app->get('/modus', function () use ($modusController) {
+      $response = $modusController->getAllModus();
+      FrontController::echoResponse($response);
+    });
+  }
+  
+  private function _registerCategorieRoutes() {
+    $categorieController = new CategorieController();
+    $this->_app->get('/categories', function () use ($categorieController) {
+      $response = $categorieController->getAllCategories();
+      FrontController::echoResponse($response);
+    });
+  }
+  
+  private function _registerTagRoutes() {
+    $tagController = new TagController();
+    $this->_app->get('/tags', function () use ($tagController) {
+      $response = $tagController->getAllTags();
+      FrontController::echoResponse($response);
+    });
+  }
+  
+  private function _registerTextRoutes() {
+    $textController = new TextController();
+    $this->_app->post('/text', function () use ($textController) {
+      $post = $this->_decodeUrl();
+      $response = $textController->createText($post);
+      FrontController::echoResponse($response);
+    });
+    $this->_app->put('/text/:id', function ($id) use ($textController) {
+      $post = $this->_decodeUrl();
+      $response = $textController->updateText($id, $post);
+      FrontController::echoResponse($response);
+    });
   }
 }
