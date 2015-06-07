@@ -82,7 +82,7 @@ class FrontController {
     
     $this->_app->post('/login', function () use ($userController) {
       $post = $this->_decodeUrl();
-      $response = $userController->authenticate($post['email'], $post['pass']);
+      $response = $userController->checkLogin($post['email'], $post['pass']);
       FrontController::echoResponse($response);
       
     });
