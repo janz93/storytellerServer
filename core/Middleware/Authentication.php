@@ -3,7 +3,6 @@
 namespace Storyteller\core\Middleware;
 
 use Storyteller\app\model\UserTable;
-use Slim\Slim;
 
 class Authentication extends \Slim\Middleware {
   
@@ -13,10 +12,16 @@ class Authentication extends \Slim\Middleware {
     '/login'
   );
   
+  public static $validUser;
+  
+  private $_userTable = null;
+  
   public function __construct() {
     if (!isset($this->app)) {
       $this->app = \Slim\Slim::getInstance();
     }
+    
+    $this->_userTable = new UserTable();
   }
   
   public function call() {
@@ -24,13 +29,15 @@ class Authentication extends \Slim\Middleware {
     $res = $this->app->response();
     $message = array();
     if (!in_array($req->getResourceUri(), $this->_noAuthentificationRoutes)) {
-      $apikey = apache_request_headers()['Authorization'];
+      $header = apache_request_headers();
       // Verifying Authorization Header
-      if (!empty($apikey)) {
+      if (!empty($header['Authorization'])) {
         // validating api key
-        if (!$this->_isValidApikey($apikey)) {
+        if (!$this->_isValidApikey($header['Authorization'])) {
           // api key is not present in users table
           $message["error"] = "Access Denied. Invalid Api key";
+        } else {
+          self::$validUser = $this->_userTable->findUserByApikey($header['Authorization']);
         }
       } else {
         // api key is missing in header
@@ -46,8 +53,7 @@ class Authentication extends \Slim\Middleware {
   }
   
   private function _isValidApikey($apikey) {
-    $userTable = new UserTable();
-    $user = $userTable->findUserByApikey($apikey);
+    $user = $this->_userTable->findUserByApikey($apikey);
     if (!empty($user)) {
       return true;
     } else {
