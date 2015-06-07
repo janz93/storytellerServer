@@ -16,9 +16,9 @@ class StoryController {
     if (is_numeric($id)) {
       $story = $this->_storyModel->getStory((int) $id);
       if (!empty($story)) {
-        return array('storyPart' => $story);
+        return array('success' => true, 'storyParts' => $story);
       } else {
-        return array('error' => 'No story found by given ID');
+        return array('error' => true, 'message' => 'No story found by given ID');
       }
     }
   }
@@ -26,34 +26,34 @@ class StoryController {
   public function findUserStories($userId) {
     $stories = $this->_storyModel->getAllStoryForUser((int) $userId);
     if (!empty($stories)) {
-      return array('stories' => $stories);
+      return array('success' => true, 'stories' => $stories);
     } else {
-      return array('error' => 'No stories found for given user');
+      return array('error' => true, 'message' => 'No stories found for given user');
     }
   }
   
   public function createStory($postParams) {
     $newStory = $this->_storyModel->createStory($postParams);
     if (!empty($newStory)) {
-      return array('story' => $newStory);
+      return array('success' => true, 'story' => $newStory);
     } else {
-      return array('error' => 'Story could not be created');
+      return array('error' => true, 'message' => 'Story could not be created');
     }
   }
   
   public function updateStory($id, $postParams) {
     if ($this->_storyModel->updateStory($id, $postParams) > 0) {
-      return array('success' => 'Story could be updated');
+      return array('success' => true, 'message' => 'Story could be updated');
     } else {
-      return array('error' => 'Story could not be updated');
+      return array('error' => true, 'message' => 'Story could not be updated');
     }
   }
   
   public function deleteStory($id) {
     if ($this->_storyModel->deleteStory($id) > 0) {
-      return array('success' => 'Story could be deleted');
+      return array('success' => true, 'message' => 'Story could be deleted');
     } else {
-      return array('error' => 'Story could not be deleted');
+      return array('error' => true, 'message' => 'Story could not be deleted');
     }
   }
 }

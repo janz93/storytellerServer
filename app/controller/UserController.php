@@ -20,7 +20,7 @@ class UserController {
     $newUser = $this->_userModel->createUser($postParams);
     if (!empty($newUser)) {
       unset($newUser->pass);
-      return array('user' => $newUser);
+      return array('success' => true, 'user' => $newUser);
     } else {
       return array('error' => 'User could not be created');
     }
@@ -36,9 +36,9 @@ class UserController {
     if ($this->_userModel->checkUser($email, $pass)) {
       $user = $this->_userModel->findUserByEmail($email);
       unset($user->pass);
-      return array('user' => $user);
+      return array('success' => true, 'user' => $user);
     } else {
-      return array('error' => 'Invalid User Request');
+      return array('error' => true, 'message' => 'Invalid User Request');
     }
   }
   
@@ -52,9 +52,9 @@ class UserController {
       $user = $this->_userModel->findUserByID((int) $id);
       if (!empty($user)) {
         unset($user->pass);
-        return array('user' => $user);
+        return array('success' => true, 'user' => $user);
       } else {
-        return array('error' => 'No User found by given ID');
+        return array('error' => true, 'message' => 'No User found by given ID');
       }
     }
   }

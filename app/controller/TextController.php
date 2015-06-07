@@ -15,17 +15,17 @@ class TextController {
   public function createText($postArr) {
    $newStoryPart =  $this->_textModel->insertText($postArr);
    if (!empty($newStoryPart)) {
-      return array('newStoryPart' => $newStoryPart);
+      return array('success' => true, 'newStoryPart' => $newStoryPart);
     } else {
-      return array('error' => 'new story part could not be created');
+      return array('error' => true, 'message' => 'new story part could not be created');
     }
   }
   
   public function updateText($id, $postParams) {
     if ($this->_textModel->updateText($id, $postParams) > 0) {
-      return array('success' => 'Story part could be updated');
+      return array('success' => true, 'message' => 'Story part could be updated');
     } else {
-      return array('error' => 'Story part could not be updated');
+      return array('error' => true, 'message' => 'Story part could not be updated');
     }
   }
   

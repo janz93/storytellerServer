@@ -35,17 +35,17 @@ class Authentication extends \Slim\Middleware {
         // validating api key
         if (!$this->_isValidApikey($header['Authorization'])) {
           // api key is not present in users table
-          $message["error"] = "Access Denied. Invalid Api key";
+          $message = "Access Denied. Invalid Api key";
         } else {
           self::$validUser = $this->_userTable->findUserByApikey($header['Authorization']);
         }
       } else {
         // api key is missing in header
-        $message["error"] = "Api key is misssing";
+        $message = "Api key is misssing";
       }
       if (!empty($message)) {
         $res->setStatus(401);
-        echo (json_encode(array('message' => $message)));
+        echo (json_encode(array('error' => true, 'message' => $message)));
         exit;
       }
     }

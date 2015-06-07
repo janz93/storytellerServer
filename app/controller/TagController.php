@@ -14,9 +14,9 @@ class TagController {
   public function getAllTags() {
     $tags = $this->_tagModel->getTags();
     if (!empty($tags)) {
-      return array('tags' => $tags);
+      return array('success' => true, 'tags' => $tags);
     } else {
-      return array('error' => 'No tags found');
+      return array('error' => true, 'message' => 'No tags found');
     }
   }
 }

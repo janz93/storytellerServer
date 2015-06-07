@@ -15,9 +15,9 @@ class CategorieController {
   public function getAllCategories() {
   $categories = $this->_categorieModel->getCategories();
   if (!empty($categories)) {
-      return array('categories' => $categories);
+      return array('success' => true, 'categories' => $categories);
     } else {
-      return array('error' => 'No stories found for given user');
+      return array('error' => true, 'message' => 'No stories found for given user');
     }
   }
 }

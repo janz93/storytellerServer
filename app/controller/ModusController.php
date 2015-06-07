@@ -14,9 +14,9 @@ class ModusController {
   public function getAllModus() {
   $modus = $this->_modusModel->getModus();
   if (!empty($modus)) {
-      return array('modus' => $modus);
+      return array('success' => true, 'modus' => $modus);
     } else {
-      return array('error' => 'No modus found');
+      return array('error' => true, 'message' => 'No modus found');
     }
   }
 }

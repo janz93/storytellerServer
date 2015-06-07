@@ -25,18 +25,18 @@ class FrontController {
     $this->_app->run();
   }
   
-  public function echoResponse($message) {
+  public function echoResponse($response) {
     if ($this->_checkApiRequest()) {
       $this->_app->response->headers->set(
         'Content-Type',
         'application/json'
       );
       
-      if (isset($message['error'])) {
+      if (isset($response['error'])) {
         $this->_app->response->setStatus(400);
       }
       
-      echo json_encode(array('message' => $message));
+      echo json_encode($response);
       $this->_app->stop();
     }
   }
