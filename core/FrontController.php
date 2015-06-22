@@ -103,6 +103,18 @@ class FrontController {
       $response = $storyController->findStory($id);
       FrontController::echoResponse($response);
     });
+    $this->_app->get('/search-story/title/:title', function ($title) use ($storyController) {
+      $response = $storyController->findStoryByTitle($title);
+      FrontController::echoResponse($response);
+    });
+    $this->_app->get('/search-story/category/:category', function ($category) use ($storyController) {
+      $response = $storyController->findStoryByCategory($category);
+      FrontController::echoResponse($response);
+    });
+    $this->_app->get('/search-story/:query+', function ($query) use ($storyController) {
+      $response = $storyController->findStoryByQuery($query);
+      FrontController::echoResponse($response);
+    });
     $this->_app->post('/story', function () use ($storyController) {
       $post = $this->_decodeUrl();
       $response = $storyController->createStory($post);

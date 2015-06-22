@@ -25,13 +25,35 @@ class StoryController {
   
   public function findStoryByTitle($title) {
      if (!empty($title)) {
-      $story = $this->_storyModel->findStoryByTitle($title);
-      if (!empty($story)) {
-        return array('success' => true, 'storyParts' => $story);
+      $searchResult = $this->_storyModel->findStoryByTitle($title);
+      if (!empty($searchResult)) {
+        return array('success' => true, 'searchResult' => $searchResult);
       } else {
-        return array('error' => true, 'message' => 'No story found by given ID');
+        return array('error' => true, 'message' => 'No story found by given Title');
       }
     } 
+  }
+  
+  public function findStoryByCategory($categoryName) {
+    if (!empty($categoryName)) {
+      $searchResult = $this->_storyModel->findStoryByCategory($categoryName);
+      if (!empty($searchResult)) {
+        return array('success' => true, 'searchResult' => $searchResult);
+      } else {
+        return array('error' => true, 'message' => 'No story found by given Category');
+      }
+    }
+  }
+  
+  public function findStoryByQuery($searchQueryArr) {
+    if (!empty($searchQueryArr)) {
+      $searchResult = $this->_storyModel->findStoryByQuery($searchQueryArr);
+      if (!empty($searchResult) && (count($searchQueryArr) == 2)) {
+        return array('success' => true, 'searchResult' => $searchResult);
+      } else {
+        return array('error' => true, 'message' => 'No story found by given Category');
+      }
+    }
   }
   
   public function findUserStories($userId) {

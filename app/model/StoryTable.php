@@ -22,18 +22,18 @@ class StoryTable extends Table {
   }
   
   public function findStoryByTitle($title) {
-    $this->setWhereCondition('`' . $this->_name . '`.`title`  LIKE "%?%"', $id);
+    $this->setWhereCondition('`' . $this->_name . '`.`title` LIKE "%?%"', $title);
     return $this->findAll($this->_name);
   }
   
-  public function findStoryByCategory($categoryId) {
-    $this->setWhereCondition('`' . $this->_name . '`.`category_id` = ?', $id);
+  public function findStoryByCategory($categoryName) {
+    $this->setJoin('category', '`category`.`name` LIKE "%?%"', $categoryName);
     return $this->findAll($this->_name);
   }
   
-  public function findStory($searchArgs) {
-    $this->setJoin('text', '`' . $this->_name . '`.`id` = `text`.`story_id`');
-    $this->setWhereCondition('`' . $this->_name . '`.`id` = ?', $id);
+  public function findStoryByQuery($searchArgs) {
+    $this->setJoin('category', '`category`.`name` LIKE "%?%"', $searchArgs[1]);
+    $this->setWhereCondition('`' . $this->_name . '`.`title` LIKE "%?%"', $searchArgs[0]);
     return $this->findAll($this->_name);
   }
   
