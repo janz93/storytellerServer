@@ -95,7 +95,7 @@ class FrontController {
   
   private function _registerStoryRoutes() {
     $storyController = new StoryController();
-    $this->_app->get('/stories', function () use ($storyController) {
+    $this->_app->get('/own-stories', function () use ($storyController) {
       $response = $storyController->findUserStories(Authentication::$validUser->id);
       FrontController::echoResponse($response);
     });
@@ -153,6 +153,11 @@ class FrontController {
     $this->_app->put('/text/:id', function ($id) use ($textController) {
       $post = $this->_decodeUrl();
       $response = $textController->updateText($id, $post);
+      FrontController::echoResponse($response);
+    });
+    
+    $this->_app->get('/collaborate-stories', function () use ($textController) {
+      $response = $textController->findCollaborateStories(Authentication::$validUser->id);
       FrontController::echoResponse($response);
     });
   }

@@ -102,7 +102,7 @@ class Table {
     foreach ($data as $column => $value) {
       $query->bindColumn($column, $value);
     }
-    if($query->execute($data)) {
+    if ($query->execute($data)) {
       $this->setWhereCondition('`id` = ?', $this->_PdoConntector->lastInsertId());
       if ($this->_hasWhereCondition()) {
         $query = $this->_prepareSql($table);

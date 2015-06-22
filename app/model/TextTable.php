@@ -41,6 +41,12 @@ class TextTable extends Table {
     return $this->update($this->_name, $data);
   }
   
+  public function getAllCollaborateStoryForUser($id) {
+    $this->setJoin('story', '(`story`.`id` = `text`.`story_id` AND `text`.`author_id` != `story`.`author_id`)');
+    $this->setWhereCondition('`' . $this->_name . '`.`author_id` = ?' , $id);
+    return $this->findAll($this->_name);
+  }
+  
   private function _isNotStoryFinished($storyId) {
     $sql = 'SELECT `num_text` AS storyLimit FROM `story` WHERE `id` = ?';
     $query = $this->_PdoConntector->prepare($sql);

@@ -21,6 +21,22 @@ class StoryTable extends Table {
     return $this->findAll($this->_name);
   }
   
+  public function findStoryByTitle($title) {
+    $this->setWhereCondition('`' . $this->_name . '`.`title`  LIKE "%?%"', $id);
+    return $this->findAll($this->_name);
+  }
+  
+  public function findStoryByCategory($categoryId) {
+    $this->setWhereCondition('`' . $this->_name . '`.`category_id` = ?', $id);
+    return $this->findAll($this->_name);
+  }
+  
+  public function findStory($searchArgs) {
+    $this->setJoin('text', '`' . $this->_name . '`.`id` = `text`.`story_id`');
+    $this->setWhereCondition('`' . $this->_name . '`.`id` = ?', $id);
+    return $this->findAll($this->_name);
+  }
+  
   public function getAllStoryForUser($id) {
     $this->setWhereCondition('`author_id` = ?' , $id);
     return $this->findAll($this->_name);

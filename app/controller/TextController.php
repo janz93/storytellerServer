@@ -29,4 +29,13 @@ class TextController {
     }
   }
   
+  public function findCollaborateStories($userId) {
+    $stories = $this->_textModel->getAllCollaborateStoryForUser((int) $userId);
+    if (!empty($stories)) {
+      return array('success' => true, 'collaborateStories' => $stories);
+    } else {
+      return array('error' => true, 'message' => 'No stories found for given user');
+    }
+  }
+  
 }

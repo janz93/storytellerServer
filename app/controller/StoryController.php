@@ -23,10 +23,21 @@ class StoryController {
     }
   }
   
+  public function findStoryByTitle($title) {
+     if (!empty($title)) {
+      $story = $this->_storyModel->findStoryByTitle($title);
+      if (!empty($story)) {
+        return array('success' => true, 'storyParts' => $story);
+      } else {
+        return array('error' => true, 'message' => 'No story found by given ID');
+      }
+    } 
+  }
+  
   public function findUserStories($userId) {
     $stories = $this->_storyModel->getAllStoryForUser((int) $userId);
     if (!empty($stories)) {
-      return array('success' => true, 'stories' => $stories);
+      return array('success' => true, 'ownStories' => $stories);
     } else {
       return array('error' => true, 'message' => 'No stories found for given user');
     }
@@ -56,4 +67,5 @@ class StoryController {
       return array('error' => true, 'message' => 'Story could not be deleted');
     }
   }
+  
 }
