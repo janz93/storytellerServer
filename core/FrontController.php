@@ -112,6 +112,7 @@ class FrontController {
       FrontController::echoResponse($response);
     });
     $this->_app->get('/search-story/:query+', function ($query) use ($storyController) {
+      unset($query[0]);
       $response = $storyController->findStoryByQuery($query);
       FrontController::echoResponse($response);
     });
