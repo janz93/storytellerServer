@@ -22,19 +22,19 @@ class StoryTable extends Table {
   }
   
   public function findStoryByTitle($title) {
-    $this->setWhereCondition('`' . $this->_name . '`.`title` LIKE "%?%"', $title);
+    $this->setWhereCondition('`' . $this->_name . '`.`title` LIKE "%' . $title . '%"', '');
     return $this->findAll($this->_name);
   }
   
   public function findStoryByCategory($categoryName) {
-    $this->setJoin('category', '`category`.`name` LIKE "%?%"', $categoryName);
-    return $this->findAll($this->_name);
+    $this->setJoin('category', '`category`.`name` LIKE "%' . $categoryName . '%"', '');
+    return $this->findAll($this->_name, '`' . $this->_name . '`.*');
   }
   
   public function findStoryByQuery($searchArgs) {
-    $this->setJoin('category', '`category`.`name` LIKE "%?%"', $searchArgs[1]);
-    $this->setWhereCondition('`' . $this->_name . '`.`title` LIKE "%?%"', $searchArgs[0]);
-    return $this->findAll($this->_name);
+    $this->setJoin('category', '`category`.`name` LIKE "%' . $searchArgs[2] . '%"', '');
+    $this->setWhereCondition('`' . $this->_name . '`.`title` LIKE "%' . $searchArgs[1] . '%"', '');
+    return $this->findAll($this->_name, '`' . $this->_name . '`.*');
   }
   
   public function getAllStoryForUser($id) {
