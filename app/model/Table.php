@@ -24,12 +24,12 @@ class Table {
    * @param string $table
    * @return mixed|NULL
    */
-  public function find($table) {
+  public function find($table, $columns = '*') {
     if ($this->_hasWhereCondition()) {
-      $query = $this->_prepareSql($table);
+      $query = $this->_prepareSql($table, $columns);
       $query->execute(array($this->_whereCondition['value']));
     } else {
-      $query = $this->_prepareSql($table);
+      $query = $this->_prepareSql($table, $columns);
       $query->execute();
     }
     $row = $query->fetch(\PDO::FETCH_OBJ);
@@ -41,13 +41,19 @@ class Table {
     $this->_unsetParams();
   }
   
-  public function findAll($table) {
+  public function findAll($table, $columns = '*') {
     if ($this->_hasWhereCondition()) {
-      $query = $this->_prepareSql($table);
+      $query = $this->_prepareSql($table, $columns);
+      //var_dump($query->queryString);
+      //exit;
       $query->execute(array($this->_whereCondition['value']));
+      //var_dump($query->queryString);
+      //exit;
     } else {
-      $query = $this->_prepareSql($table);
+      $query = $this->_prepareSql($table, $columns);
       $query->execute();
+      //var_dump($query->queryString);
+      //exit;
     }
     $rowset = $query->fetchAll(\PDO::FETCH_OBJ);
     if ($rowset){
@@ -164,8 +170,8 @@ class Table {
     return ' WHERE ' . $this->_whereCondition['sql'];
   }
   
-  private function _prepareSql($table) {
-    $sql = 'SELECT * FROM `' . $table . '`';
+  private function _prepareSql($table, $columns = '*') {
+    $sql = 'SELECT ' . $columns . ' FROM `' . $table . '`';
     if ($this->_hasJoin()) {
       $sql .= $this->_createJoin($sql);
     } 
