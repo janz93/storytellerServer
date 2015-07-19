@@ -38,7 +38,7 @@ class UserController {
       unset($user->pass);
       return array('success' => true, 'user' => $user);
     } else {
-      return array('error' => true, 'message' => 'Invalid User Request');
+      return array('error' => true, 'message' => 'Invalid Login Request');
     }
   }
   
