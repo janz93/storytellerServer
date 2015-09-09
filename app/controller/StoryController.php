@@ -12,6 +12,10 @@ class StoryController {
     $this->_storyModel = new StoryTable();
   }
   
+  public function testFind() {
+    $this->_storyModel->testFind();
+  }
+  
   public function findStory($id) {
     if (is_numeric($id)) {
       $story = $this->_storyModel->getStory((int) $id);

@@ -1,22 +1,34 @@
 <?php
 
 namespace Storyteller\app\model;
+use Storyteller\core\db\Query;
 
-class Table {
+
+class Table extends Query {
   
-  private $_whereCondition = array();
-  private $_join = array();
-  private $_sqlType = 'SELECT';
-  protected $_PdoConntector = null;
   protected $_name;
   
-  public function __construct() {
-    try {
-      $this->_PdoConntector = new \PDO('mysql:' . DB_HOST . '=localhost;dbname=' . DB_DATABASE, DB_USER, DB_PASS);
-      $this->_PdoConntector->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-    } catch (\PDOException $e) {
-      echo 'Error' . $e->getMessage();
+  public function find() {
+    $tableInfo = $this->_getTableMeta();
+    var_dump($tableInfo);
+    $args = func_get_args();
+    $sql = 'SELECT * FROM' . $tableInfo['name'];
+    if (is_array($args) && !is_array($tableInfo['primary'])) {
+      for ($i = 0; $i < count($args[0]); $i++) {
+        if ($i == 0) {
+          $sql .= 'WHERE ' . $tableInfo['primary'] . ' = :' . $tableInfo['primary'];
+        } else {
+          $sql .= 'OR ' . $tableInfo['primary'] . ' = :' . $tableInfo['primary'];
+        }
+        
+      }
+    } else {
+      $sql .= 'WHERE ' . $tableInfo['primary'] . ' = :' . $tableInfo['primary'];
     }
+    
+    $this->
+    var_dump($args);
+    exit;
   }
   
   /**
@@ -24,37 +36,22 @@ class Table {
    * @param string $table
    * @return mixed|NULL
    */
-  public function find($table, $columns = '*') {
-    if ($this->_hasWhereCondition()) {
-      $query = $this->_prepareSql($table, $columns);
-      $query->execute(array($this->_whereCondition['value']));
-    } else {
-      $query = $this->_prepareSql($table, $columns);
-      $query->execute();
-    }
+  public function fetch($Query) {
+    $query = $Query->finalQuery();
+    $query->execute();
     $row = $query->fetch(\PDO::FETCH_OBJ);
     if ($row){
       return $row;
     } else {
       return null;
     }
-    $this->_unsetParams();
   }
   
-  public function findAll($table, $columns = '*') {
-    if ($this->_hasWhereCondition()) {
-      $query = $this->_prepareSql($table, $columns);
-      //var_dump($query->queryString);
-      //exit;
-      $query->execute(array($this->_whereCondition['value']));
-      //var_dump($query->queryString);
-      //exit;
-    } else {
-      $query = $this->_prepareSql($table, $columns);
-      $query->execute();
-      //var_dump($query->queryString);
-      //exit;
-    }
+  
+  public function fetchAll($Query) {
+    $query = $Query->finalQuery();
+    var_dump($query);
+    $query->execute();
     $rowset = $query->fetchAll(\PDO::FETCH_OBJ);
     if ($rowset){
       return $rowset;
@@ -154,6 +151,10 @@ class Table {
     $this->_whereCondition = array('sql' => $sql, 'value' => $valueArr);
   }
   
+  public function info() {
+    return $this->_name;
+  }
+  
   /**
    * 
    * @return boolean
@@ -170,8 +171,8 @@ class Table {
     return ' WHERE ' . $this->_whereCondition['sql'];
   }
   
-  private function _prepareSql($table, $columns = '*') {
-    $sql = 'SELECT ' . $columns . ' FROM `' . $table . '`';
+  private function _prepareSql($table, $select) {
+    $sql = $select . ' FROM `' . $table . '`';
     if ($this->_hasJoin()) {
       $sql .= $this->_createJoin($sql);
     } 
@@ -182,8 +183,7 @@ class Table {
     return $this->_PdoConntector->prepare($sql);
   }
   
-  private function _unsetParams() {
-    $this->_whereCondition = array();
-    $this->_join = array();
+  private function _getTableMeta() {
+    return array('name' => $this->_name, 'primary' => $this->_primary);
   }
 }

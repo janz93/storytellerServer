@@ -9,7 +9,8 @@ class Authentication extends \Slim\Middleware {
   private $_noAuthentificationRoutes = array(
     '/',
     '/api/register',
-    '/api/login'
+    '/api/login',
+    '/api/testfind'
   );
   
   public static $validUser;

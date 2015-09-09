@@ -95,6 +95,9 @@ class FrontController {
   
   private function _registerStoryRoutes() {
     $storyController = new StoryController();
+    $this->_app->get('/testfind', function () use ($storyController) {
+      $storyController->testFind();
+    });
     $this->_app->get('/own-stories', function () use ($storyController) {
       $response = $storyController->findUserStories(Authentication::$validUser->id);
       FrontController::echoResponse($response);

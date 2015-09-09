@@ -6,7 +6,8 @@ use Storyteller\app\model\UserTable;
 
 class StoryTable extends Table {
   
-  protected $_name = 'story';
+  public $_name = 'story';
+  public $_primary = 'id';
   
   private $_dependentTables = array(
     'UserTable', 
@@ -14,6 +15,18 @@ class StoryTable extends Table {
     'TagTable',
     'ModusTable'
   );
+  
+  public function testFind() {
+    //$this->find(array(12,15));
+    $result = $this->fetchAll(
+      $this->select()
+        ->from($this)
+        ->where('id = ?', 3)
+        ->Where('id = ?', 6)
+    );
+    var_dump($result);
+    exit;
+  }
   
   public function getStory($id) {
     $this->setJoin('text', '`' . $this->_name . '`.`id` = `text`.`story_id`');
