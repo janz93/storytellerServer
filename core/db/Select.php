@@ -61,33 +61,24 @@ class Select {
       $this->_stm .= ' ';
     } else {
       $this->_stm .= 'ORDER BY ' . $this->_checkOrder($arg) . ' ';
-    }
+    } 
     return $this;
   }
   
   public function limit($count, $offset = 0) {
-    if (!is_numeric($count) && $count > 0) {
+    if (is_numeric($count) && $count > 0) {
       $this->_stm .= 'LIMIT ' . $count . ' ';
       if ($offset > 0) {
         $this->_stm .= ' OFFSET ' . $offset . ' ';
       }
     }
+    return $this;
   }
   
   public function finalQuery() {
-//     var_dump($this->_bind);
-//     exit;
-//     $string = 'john';
-//     $sql = "select * from user where name = ? AND email = ?";
-//     $query = $this->_db->prepare($sql);
-//     $query->bindValue(1, $string);
-//     $query->bindValue(2, $string);
-    
     $query = $this->_db->prepare($this->_stm);
     if (!empty($this->_bind)) {
       foreach ($this->_bind as $parameter => $value) {
-        var_dump($parameter);
-        var_dump($value);
         $query->bindValue($parameter, $value);
       }
     }
