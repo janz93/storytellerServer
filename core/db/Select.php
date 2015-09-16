@@ -1,52 +1,29 @@
 <?php
+
 namespace Storyteller\core\db;
 
 use Storyteller\core\db;
 
-class Select {
+class Select extends Query {
   
-  private $_db = null;
-  private $_stm = '';
-  private $_bind = array();
-  private $isWhereExsists = false;
-  
-  public function __construct(\PDO $db) {
-    $this->_db = $db;
-    $this->_stm = 'SELECT ';
+  public function __construct($pdo) {
+    $this->PDOConntector = $pdo;
+    $this->stm = self::SQL_SELECT . ' %s ';
   }
   
-  public function from($table, $columns = array()) {
-    if (empty($columns)) {
-      $this->_stm .= '* ';
-    } else  {
-      $this->_stm .= implode(', ' . $table->info() . '.', $columns) . ' ';
-    }
-    $this->_stm .= 'FROM ' . $table->info() . ' ';
+  private $_columns = array();
+  
+  public function columns($table, $columns) {
+    $this->_columns += array($table->info() => $columns);
     return $this;
   }
   
-  public function where($sql, $value = null) {
-    if (!$this->isWhereExsists) {
-      $this->_stm .= 'WHERE ' . $sql . ' ';
-      $this->isWhereExsists = true;
-    } else {
-      $this->_stm .= 'AND ' . $sql . ' ';
-    }
-    if (!is_null($value)) {
-      $this->_addBindValue($sql, $value);
-    }
-    return $this;
-  }
-  
-  public function orWhere($sql, $value = null) {
-  if (!$this->isWhereExsists) {
-      $this->_stm .= 'WHERE ' . $sql . ' ';
-      $this->isWhereExsists = true;
-    } else {
-      $this->_stm .= 'OR ' . $sql . ' ';
-    }
-    if (!is_null($value)) {
-      $this->_addBindValue($sql, $value);
+  public function limit($count, $offset = 0) {
+    if (is_numeric($count) && $count > 0) {
+      $this->stm .= self::SQL_LIMIT . ' ' . $count . ' ';
+      if ($offset > 0) {
+        $this->stm .= self::SQL_OFFSET . ' ' . $offset . ' ';
+      }
     }
     return $this;
   }
@@ -54,46 +31,47 @@ class Select {
   public function order($arg) {
     $argsAmount = count($arg);
     if (is_array($arg) && $argsAmount > 1) {
-      $this->_stm .= 'ORDER BY ';
-      for ($i = 0; $i < $argsAmount; $i++) {
-        $this->_stm .= $this->_checkOrder($arg[$i]) . ', ';
+      $this->stm .= self::SQL_ORDER_BY;
+      for ($i = 0; $i < $argsAmount; $i ++) {
+        $this->stm .= $this->_checkOrder($arg [$i]) . ', ';
       }
-      $this->_stm .= ' ';
+      $this->stm .= ' ';
     } else {
-      $this->_stm .= 'ORDER BY ' . $this->_checkOrder($arg) . ' ';
-    } 
-    return $this;
-  }
-  
-  public function limit($count, $offset = 0) {
-    if (is_numeric($count) && $count > 0) {
-      $this->_stm .= 'LIMIT ' . $count . ' ';
-      if ($offset > 0) {
-        $this->_stm .= ' OFFSET ' . $offset . ' ';
-      }
+      $this->stm .= self::SQL_ORDER_BY . ' ' . $this->_checkOrder($arg) . ' ';
     }
     return $this;
   }
   
   public function finalQuery() {
-    $query = $this->_db->prepare($this->_stm);
-    if (!empty($this->_bind)) {
-      foreach ($this->_bind as $parameter => $value) {
-        $query->bindValue($parameter, $value);
+    $finalColumns = '';
+    if (empty($this->_columns)) {
+      $finalColumns = self::SQL_WILDCARD;
+    } else {
+      $numColumnsTables = count($this->_columns);
+      $j = 1;
+      foreach ($this->_columns as $table => $columnsArr) {
+        $numColums = count($columnsArr);
+        for ($i = 0; $i < $numColums; $i++) {
+          $finalColumns .= '`' . $table . '`.`' . $columnsArr[$i] . '`';
+          if ($j == $numColumnsTables && $i == ($numColums -1)) {
+            $finalColumns .= '';
+          } else {
+            $finalColumns .= ', ';
+          }
+        }
+        $j++;
       }
     }
-    return $query;
+    $this->stm = sprintf($this->stm, $finalColumns);
+    
+    return parent::finalQuery($this->PDOConntector);
   }
-  
-  private function _addBindValue($sql, $value) {
-    if (preg_match('/:\w+/', $sql, $match)) {
-      $this->_bind += array($match[0] => $value);
-    } elseif (preg_match('/\?/', $sql, $match)) {
-      $this->_bind += array(count($this->_bind) + 1 => $value);
-    }
-  }
+
   
   private function _checkOrder($sql) {
+    if (!is_string($sql)) {
+      throw new \InvalidArgumentException('$sql argument must be a string');
+    }
     if (preg_match('/(A|DE)SC/', $sql)) {
       return $sql;
     } else {
