@@ -10,7 +10,16 @@ class Query implements Mysql {
   private $_bind = array();
   private $isWhereExsists = false;
   
-  
+  /**
+   * Specify legal join types.
+   *
+   * @var array
+   */
+  protected static $_joinTypes = array(
+    self::SQL_JOIN,
+    self::SQL_LEFT_JOIN,
+    self::SQL_RIGHT_JOIN
+  );
   
   public function __construct() {
     try {
@@ -45,7 +54,20 @@ class Query implements Mysql {
     return $this;
   }
   
+  public function join($table, $condistion, $columns) {
+    $this->_join(self::SQL_JOIN, $table, $condistion, $columns);
+    return $this;
+  }
   
+  public function leftJoin($table, $condistion, $columns) {
+    $this->_join(self::SQL_LEFT_JOIN, $table, $condistion, $columns);
+    return $this;
+  }
+  
+  public function rightJoin($table, $condistion, $columns) {
+    $this->_join(self::SQL_Right_JOIN, $table, $condistion, $columns);
+    return $this;
+  }
   
   public function where($sql, $value = null) {
     if (! $this->isWhereExsists) {
@@ -95,4 +117,13 @@ class Query implements Mysql {
     }
   }
   
+  private function _join($type, $table, $condition, $columns) {
+    if (!in_array($type, self::$_joinTypes)) {
+      //       throw new
+    }
+  
+    $this->stm .= $type . ' `' . $table->info() . '` ';
+    $this->stm .= self::SQL_ON . ' ' . $condition . ' ';
+    $this->columns($table, $columns);
+  }
 }
