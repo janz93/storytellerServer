@@ -11,6 +11,12 @@ class Table {
     return new Query();
   }
   
+  public function select() {
+    return $this->getAdapter()->select();
+  }
+  
+  
+  
   public function find() {
     $tableInfo = $this->_getTableMeta();
     var_dump($tableInfo);
