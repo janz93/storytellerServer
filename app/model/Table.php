@@ -23,6 +23,9 @@ class Table {
     return $this->getAdapter()->update($this, $data, $where);
   }
   
+  public function insert($data, $showResult = false) {
+    return $this->getAdapter()->insert($this, $data, $showResult);
+  }
   
   public function find() {
     $tableInfo = $this->_getTableMeta();
