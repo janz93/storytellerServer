@@ -15,6 +15,10 @@ class Table {
     return $this->getAdapter()->select();
   }
   
+  public function delete(Query $where) {
+    return $this->getAdapter()->delete($this, $where);
+  }
+  
   
   
   public function find() {
