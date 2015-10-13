@@ -15,10 +15,6 @@ class Table {
     return $this->getAdapter()->select();
   }
   
-  public function delete(Query $where) {
-    return $this->getAdapter()->delete($this, $where);
-  }
-  
   public function update($data, $where = null) {
     return $this->getAdapter()->update($this, $data, $where);
   }
