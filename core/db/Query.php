@@ -7,19 +7,8 @@ class Query implements Mysql {
   
   public $PDOConntector = null;
   public $stm = '';
-  private $_bind = array();
-  private $isWhereExsists = false;
-  
-  /**
-   * Specify legal join types.
-   *
-   * @var array
-   */
-  protected static $_joinTypes = array(
-    self::SQL_JOIN,
-    self::SQL_LEFT_JOIN,
-    self::SQL_RIGHT_JOIN
-  );
+  protected $_bind = array();
+  protected $_isWhereExsists = false;
   
   public function __construct() {
     try {
@@ -34,45 +23,30 @@ class Query implements Mysql {
     return new Select($this->PDOConntector);
   }
   
-  public function insert($table, array $data) {
-    $this->_finalQuery = 'INSERT ';
+  public function insert($table, array $data, $showResult = false) {
+    $insert = new Insert($this->PDOConntector, $table, $data);
+    return $this->rowCount($insert->finalQuery());
   }
   
-  public function update($table, array $data) {
-    $this->_finalQuery = 'UPDATE ';
+  public function update($table, array $data, $where, $showResult = false) {
+    $update = new Update($this->PDOConntector, $table, $data, $where);
+    return $this->rowCount($update->finalQuery());
   }
   
-  public function delete() {
-    $this->_finalQuery = 'DELETE ';
+  public function delete($table, $where) {
+    $delete = new Delete($this->PDOConntector, $table, $where);
+    return $this->rowCount($delete->finalQuery());
   }
   
-  public function from($table, $columns = array()) {
+  public function from($table) {
     $this->stm .= self::SQL_FROM . ' `' . $table->info() . '` ';
-    if (!empty($columns)) {
-      $this->columns($table, $columns);
-    }
-    return $this;
-  }
-  
-  public function join($table, $condistion, $columns) {
-    $this->_join(self::SQL_JOIN, $table, $condistion, $columns);
-    return $this;
-  }
-  
-  public function leftJoin($table, $condistion, $columns) {
-    $this->_join(self::SQL_LEFT_JOIN, $table, $condistion, $columns);
-    return $this;
-  }
-  
-  public function rightJoin($table, $condistion, $columns) {
-    $this->_join(self::SQL_Right_JOIN, $table, $condistion, $columns);
     return $this;
   }
   
   public function where($sql, $value = null) {
-    if (! $this->isWhereExsists) {
+    if (! $this->_isWhereExsists) {
       $this->stm .= self::SQL_WHERE . ' ' . $sql . ' ';
-      $this->isWhereExsists = true;
+      $this->_isWhereExsists = true;
     } else {
       $this->stm .= self::SQL_AND . ' ' . $sql . ' ';
     }
@@ -83,9 +57,9 @@ class Query implements Mysql {
   }
   
   public function orWhere($sql, $value = null) {
-    if (!$this->isWhereExsists) {
+    if (!$this->_isWhereExsists) {
       $this->stm .= self::SQL_WHERE . ' ' . $sql . ' ';
-      $this->isWhereExsists = true;
+      $this->_isWhereExsists = true;
     } else {
       $this->stm .= self::SQL_OR . ' ' . $sql . ' ';
     }
@@ -97,6 +71,8 @@ class Query implements Mysql {
   
   public function finalQuery() {
     $query = $this->PDOConntector->prepare($this->stm);
+//     var_dump($this);
+//     exit;
     if (! empty($this->_bind)) {
       foreach ($this->_bind as $parameter => $value) {
         $query->bindValue($parameter, $value);
@@ -105,25 +81,24 @@ class Query implements Mysql {
     return $query;
   }
   
+  public function hasWhereCondition() {
+    return $this->_isWhereExsists;
+  }
+  
   private function _addBindValue($sql, $value) {
-    if (preg_match ('/:\w+/', $sql, $match)) {
+    if (preg_match('/:\w+/', $sql, $match)) {
       $this->_bind += array (
         $match [0] => $value 
       );
-    } elseif (preg_match ('/\?/', $sql, $match)) {
+    } elseif (preg_match('/\?/', $sql, $match)) {
       $this->_bind += array (
         count($this->_bind) + 1 => $value 
       );
     }
   }
   
-  private function _join($type, $table, $condition, $columns) {
-    if (!in_array($type, self::$_joinTypes)) {
-      //       throw new
-    }
-  
-    $this->stm .= $type . ' `' . $table->info() . '` ';
-    $this->stm .= self::SQL_ON . ' ' . $condition . ' ';
-    $this->columns($table, $columns);
+  private function rowCount($query) {
+    $query->execute();
+    return $query->rowCount();
   }
 }

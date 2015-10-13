@@ -6,6 +6,17 @@ use Storyteller\core\db;
 
 class Select extends Query {
   
+  /**
+   * Specify legal join types.
+   *
+   * @var array
+   */
+  protected static $_joinTypes = array(
+    self::SQL_JOIN,
+    self::SQL_LEFT_JOIN,
+    self::SQL_RIGHT_JOIN
+  );
+  
   public function __construct($pdo) {
     $this->PDOConntector = $pdo;
     $this->stm = self::SQL_SELECT . ' %s ';
@@ -13,8 +24,31 @@ class Select extends Query {
   
   private $_columns = array();
   
+  public function from($table, $columns = array()) {
+    $this->stm .= self::SQL_FROM . ' `' . $table->info() . '` ';
+    if (!empty($columns)) {
+      $this->columns($table, $columns);
+    }
+    return $this;
+  }
+  
   public function columns($table, $columns) {
     $this->_columns += array($table->info() => $columns);
+    return $this;
+  }
+  
+  public function join($table, $condistion, $columns) {
+    $this->_join(self::SQL_JOIN, $table, $condistion, $columns);
+    return $this;
+  }
+  
+  public function leftJoin($table, $condistion, $columns) {
+    $this->_join(self::SQL_LEFT_JOIN, $table, $condistion, $columns);
+    return $this;
+  }
+  
+  public function rightJoin($table, $condistion, $columns) {
+    $this->_join(self::SQL_Right_JOIN, $table, $condistion, $columns);
     return $this;
   }
   
@@ -67,6 +101,15 @@ class Select extends Query {
     return parent::finalQuery($this->PDOConntector);
   }
 
+  private function _join($type, $table, $condition, $columns) {
+    if (!in_array($type, self::$_joinTypes)) {
+      //       throw new
+    }
+  
+    $this->stm .= $type . ' `' . $table->info() . '` ';
+    $this->stm .= self::SQL_ON . ' ' . $condition . ' ';
+    $this->columns($table, $columns);
+  }
   
   private function _checkOrder($sql) {
     if (!is_string($sql)) {
